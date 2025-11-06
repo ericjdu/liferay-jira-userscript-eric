@@ -9,9 +9,9 @@
 
 This userscript adds quality of life updates to Jira interface for Customer Support Engineers (CSEs) by:
 
-1. Adding **Status Colors** for easier readability.  
-2. Inserting a **link to Patcher portal** in the ticket details.  
-3. Highlighting the editor when writing **internal notes** for quick visual distinction.  
+1. Adding Status Colors for easier readability.  
+2. Inserting a link to Patcher portal in the ticket details.  
+3. Highlighting the editor when writing internal notes for quick visual distinction.  
 
 ---
 
@@ -40,7 +40,7 @@ This userscript adds quality of life updates to Jira interface for Customer Supp
 
 ## Future Features To Add
 
-1. Link to Help Center & Provisioning
-2. For Cloud Customers, add link to Cloud Console
+1. Add link to Help Center & Provisioning
+2. Add link to Cloud Console
 
 
