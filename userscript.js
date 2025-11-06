@@ -3,7 +3,7 @@
 // @author       Ally, Rita
 // @icon         https://www.liferay.com/o/classic-theme/images/favicon.ico
 // @namespace    https://liferay.atlassian.net/
-// @version      3.2
+// @version      3.3
 // @description  Pastel Jira statuses + Patcher Link field + Internal Note highlight
 // @match        https://liferay.atlassian.net/*
 // @updateURL    https://github.com/AllyMech14/liferay-jira-userscript/raw/refs/heads/main/userscript.js
@@ -85,8 +85,8 @@
         const portletId = '1_WAR_osbpatcherportlet';
         const ns = '_' + portletId + '_';
         const queryString = Object.keys(params)
-            .map(key => (key.startsWith('p_p_') ? key : ns + key) + '=' + encodeURIComponent(params[key]))
-            .join('&');
+        .map(key => (key.startsWith('p_p_') ? key : ns + key) + '=' + encodeURIComponent(params[key]))
+        .join('&');
         return 'https://patcher.liferay.com/group/guest/patching/-/osb_patcher/accounts' + path + '?p_p_id=' + portletId + '&' + queryString;
     }
 
@@ -133,68 +133,101 @@
         originalField.parentNode.insertBefore(clone, originalField.nextSibling);
     }
 
-/*********** INTERNAL NOTE HIGHLIGHT ***********/
-function highlightEditor() {
-    const editorWrapper = document.querySelector('.css-1pd6fdd');
-    const editor = document.querySelector('#ak-editor-textarea');
 
-    // Check if this is an internal comment
-    const isInternalComment = document.querySelector(
-        '[data-testid="issue-comment-base.ui.comment.comment-visibility.comment-visibility-wrapper"]'
-    );
+    /*********** INTERNAL NOTE HIGHLIGHT ***********/
+    function highlightEditor() {
+        const editorWrapper = document.querySelector('.css-1pd6fdd');
+        const editor = document.querySelector('#ak-editor-textarea');
 
-    if (isInternalComment) {
-        if (editorWrapper) {
-            editorWrapper.style.setProperty('background-color', '#FFFACD', 'important'); // pale yellow
-            editorWrapper.style.setProperty('border', '2px solid #FFD700', 'important'); // golden border
-            editorWrapper.style.setProperty('transition', 'background-color 0.3s, border 0.3s', 'important');
-        }
-        if (editor) {
-            editor.style.setProperty('background-color', '#FFFACD', 'important'); // pale yellow
-            editor.style.setProperty('transition', 'background-color 0.3s, border 0.3s', 'important');
-        }
-    } else {
-        // If not internal comment, remove highlight
-        if (editorWrapper) {
-            editorWrapper.style.removeProperty('background-color');
-            editorWrapper.style.removeProperty('border');
-        }
-        if (editor) {
-            editor.style.removeProperty('background-color');
+        // Check if this is an internal comment
+        const isInternalComment = document.querySelector(
+            '[data-testid="issue-comment-base.ui.comment.comment-visibility.comment-visibility-wrapper"]'
+        );
+
+        if (isInternalComment) {
+            if (editorWrapper) {
+                editorWrapper.style.setProperty('background-color', '#FFFACD', 'important'); // pale yellow
+                editorWrapper.style.setProperty('border', '2px solid #FFD700', 'important'); // golden border
+                editorWrapper.style.setProperty('transition', 'background-color 0.3s, border 0.3s', 'important');
+            }
+            if (editor) {
+                editor.style.setProperty('background-color', '#FFFACD', 'important'); // pale yellow
+                editor.style.setProperty('transition', 'background-color 0.3s, border 0.3s', 'important');
+            }
+        } else {
+            // If not internal comment, remove highlight
+            if (editorWrapper) {
+                editorWrapper.style.removeProperty('background-color');
+                editorWrapper.style.removeProperty('border');
+            }
+            if (editor) {
+                editor.style.removeProperty('background-color');
+            }
         }
     }
-}
 
-// Add event listeners to buttons
-function attachButtonListeners() {
-    // Select buttons
-    const internalNoteButton = document.querySelector('span._19pkidpf._2hwxidpf._otyridpf._18u0idpf._1i4qfg65._11c82smr._1reo15vq._18m915vq._1e0ccj1k._sudp1e54._1nmz9jpi._k48p1wq8[style*="Add internal note"]');
-    const replyCustomerButton = document.querySelector('span._19pkidpf._2hwxidpf._otyridpf._18u0idpf._1i4qfg65._11c82smr._1reo15vq._18m915vq._1e0ccj1k._sudp1e54._1nmz9jpi._k48p1wq8[style*="Reply to customer"]');
+    // Add event listeners to buttons
+    function attachButtonListeners() {
+        // Select buttons
+        const internalNoteButton = document.querySelector('span._19pkidpf._2hwxidpf._otyridpf._18u0idpf._1i4qfg65._11c82smr._1reo15vq._18m915vq._1e0ccj1k._sudp1e54._1nmz9jpi._k48p1wq8[style*="Add internal note"]');
+        const replyCustomerButton = document.querySelector('span._19pkidpf._2hwxidpf._otyridpf._18u0idpf._1i4qfg65._11c82smr._1reo15vq._18m915vq._1e0ccj1k._sudp1e54._1nmz9jpi._k48p1wq8[style*="Reply to customer"]');
 
-    if (internalNoteButton) {
-        internalNoteButton.addEventListener('click', () => {
-            setTimeout(highlightEditor, 100); // slight delay to let editor load
-        });
+        if (internalNoteButton) {
+            internalNoteButton.addEventListener('click', () => {
+                setTimeout(highlightEditor, 100); // slight delay to let editor load
+            });
+        }
+
+        if (replyCustomerButton) {
+            replyCustomerButton.addEventListener('click', () => {
+                setTimeout(highlightEditor, 100); // remove highlight if internal note not present
+            });
+        }
     }
 
-    if (replyCustomerButton) {
-        replyCustomerButton.addEventListener('click', () => {
-            setTimeout(highlightEditor, 100); // remove highlight if internal note not present
-        });
-    }
-}
+    /*********** INTERNAL NOTE - REMOVE SIGNATURE ***********/
 
+    // Select the "Add internal note" button
+    function removeSignatureFromInternalNote(){
+        const addNoteButton = document.querySelector('button.css-yfvug5');
+
+        if (addNoteButton) {
+            addNoteButton.addEventListener('click', () => {
+                // Create a MutationObserver to watch for the target paragraph appearing
+                const observer = new MutationObserver((mutations, obs) => {
+                    const targetParagraph = document.querySelector(
+                        'p[data-prosemirror-node-name="paragraph"][data-prosemirror-node-block="true"]'
+                    );
+
+                    if (targetParagraph && targetParagraph.innerHTML.includes('Best regards')) {
+                        // Remove the paragraph
+                        targetParagraph.remove();
+                    }
+                });
+
+                // Observe the whole document (you can narrow to a specific container if you know it)
+                observer.observe(document.body, {
+                    childList: true,
+                    subtree: true,
+                });
+            });
+        } else {
+            console.warn('Add internal note button not found.');
+        }
+    }
 
     /*********** INITIAL RUN + OBSERVERS ***********/
     styleStatuses();
     createPatcherField();
     highlightEditor();
+    removeSignatureFromInternalNote();
 
     const observer = new MutationObserver(() => {
         styleStatuses();
         createPatcherField();
         highlightEditor();
         attachButtonListeners();
+        removeSignatureFromInternalNote();
     });
     observer.observe(document.body, { childList: true, subtree: true });
 
