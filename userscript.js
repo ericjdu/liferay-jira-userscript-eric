@@ -216,6 +216,24 @@
         }
     }
 
+    /*********** OPEN ISSUES IN NEW TAB ***********/
+    function forceIssuesToOpenInNewTab() {
+        document.querySelectorAll('a[href*="/browse/"], button, div, span').forEach(el => {
+            const href = el.getAttribute('href') || el.dataset.href || el.dataset.testId || '';
+    
+            const match = href.match(/\/browse\/[A-Z]+-\d+/);
+            if (match && !el.dataset.openInNewTab) { // 👈 prevent duplicate binding
+                el.dataset.openInNewTab = 'true'; // mark as processed
+    
+                el.addEventListener('click', e => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    window.open(match[0], '_blank', 'noopener');
+                }, { capture: true });
+            }
+        });
+    }
+
     /*********** INITIAL RUN + OBSERVERS ***********/
     styleStatuses();
     createPatcherField();
@@ -228,7 +246,10 @@
         highlightEditor();
         attachButtonListeners();
         removeSignatureFromInternalNote();
+        forceIssuesToOpenInNewTab();
     });
     observer.observe(document.body, { childList: true, subtree: true });
-
+    
+// Run once on page load
+forceIssuesToOpenInNewTab();
 })();
