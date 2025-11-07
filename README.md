@@ -1,7 +1,9 @@
 # Jira for CSEs – Userscript
 
 **Version:** 1.1
+
 **Original Author:** Allison McGill
+
 **Fork Author:** Eric Du
 
 ---
